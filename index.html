@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Михаил Волков — Метрология · Авиация · Качество</title>
+<meta name="description" content="Руководитель направления по управлению оборудованием для мониторинга и измерений. ПАО «Ил». 7+ лет в авиационной промышленности.">
+<meta property="og:title" content="Михаил Волков — Метрология & Качество в авиации">
+<meta property="og:description" content="ПАО «Ил» · ISO 17025 · ФАП-21 · Аккредитация ИЛ · Метрологический надзор">
+<meta property="og:type" content="profile">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","name":"Волков Михаил Игоревич","jobTitle":"Руководитель направления по управлению оборудованием для мониторинга и измерений","telephone":"+79853686542","email":"VolkovMI@ilyushin.ru","worksFor":{"@type":"Organization","name":"ПАО «Ил»"}}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+
+/* ═══════════════════════════
+   DESIGN TOKENS
+═══════════════════════════ */
+:root {
+  /* Backgrounds — chocolate / graphite */
+  --bg:      #1e150d;   /* darkest chocolate    */
+  --bg2:     #261a10;   /* section bg           */
+  --bg3:     #2e2015;   /* card / surface       */
+  --bg4:     #38261a;   /* hover surface        */
+  --bgdark:  #111111;   /* contact / footer     */
+
+  /* Dusty blue accent */
+  --blue:    #7fa8c4;
+  --blue2:   #9bbfd6;
+  --blue3:   #5c8aa8;
+  --blue-t:  rgba(127,168,196,0.12);
+  --blue-t2: rgba(127,168,196,0.06);
+
+  /* Text — HIGH CONTRAST */
+  --t1:  #f5efe6;   /* primary — near white warm   */
+  --t2:  #d4c4ae;   /* secondary                   */
+  --t3:  #9e8e7a;   /* tertiary / labels           */
+  --t4:  #6b5d4e;   /* very muted                  */
+
+  /* Lines */
+  --ln:  rgba(245,239,230,0.09);
+  --ln2: rgba(245,239,230,0.14);
+  --ln3: rgba(127,168,196,0.20);
+
+  --display: 'Playfair Display', serif;
+  --sans:    'Jost', sans-serif;
+  --mono:    'JetBrains Mono', monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--t1);
+  line-height: 1.6;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* ── GRAIN ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 8000; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity: 0.6;
+}
+
+/* ══════════════════════════
+   PAPER PLANE CURSOR
+   — smooth spring physics
+══════════════════════════ */
+#plane-wrap {
+  position: fixed;
+  z-index: 9999;
+  pointer-events: none;
+  /* The wrapper lags behind mouse (smooth spring) */
+  /* Position updated via JS */
+  left: 0; top: 0;
+}
+#plane-inner {
+  /* The SVG rotates independently for direction */
+  width: 24px; height: 24px;
+  transform-origin: center center;
+  transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  filter: drop-shadow(0 0 5px rgba(155,191,214,0.55));
+}
+#plane-inner.hover {
+  filter: drop-shadow(0 0 9px rgba(155,191,214,0.9));
+  transform: scale(1.35) rotate(var(--plane-angle, -35deg)) !important;
+}
+/* Trail dot */
+#plane-trail {
+  position: fixed; z-index: 9997; pointer-events: none;
+  width: 4px; height: 4px; border-radius: 50%;
+  background: var(--blue2);
+  opacity: 0.5;
+  left: 0; top: 0;
+  transition: opacity 0.3s;
+}
+
+/* ── SCROLL PROGRESS ── */
+#prog {
+  position: fixed; top: 0; left: 0; z-index: 9998;
+  height: 1.5px;
+  background: linear-gradient(90deg, var(--blue3), var(--blue), var(--blue2));
+  transform-origin: left; transform: scaleX(0);
+  box-shadow: 0 0 6px rgba(127,168,196,0.4);
+}
+
+/* ══════════════════════════
+   NAVIGATION
+══════════════════════════ */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+  height: 64px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 4rem;
+  background: rgba(30,21,13,0.85);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border-bottom: 1px solid var(--ln);
+}
+
+.nav-links {
+  display: flex; gap: 0.2rem; list-style: none;
+}
+.nav-links a {
+  font-family: var(--mono);
+  font-size: 0.63rem; letter-spacing: 0.08em;
+  color: var(--t3); text-decoration: none;
+  padding: 0.35rem 0.75rem; border-radius: 4px;
+  transition: color .25s, background .25s;
+}
+.nav-links a:hover, .nav-links a.active {
+  color: var(--blue2); background: var(--blue-t);
+}
+
+.nav-pdf {
+  font-family: var(--mono);
+  font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 0.45rem 1.1rem;
+  border: 1px solid var(--ln2); border-radius: 4px;
+  background: transparent; color: var(--t3);
+  cursor: none; transition: all .25s;
+}
+.nav-pdf:hover {
+  border-color: var(--blue); color: var(--blue2); background: var(--blue-t2);
+}
+
+/* ══════════════════════════
+   HERO — two-column layout
+   (structure from v1)
+══════════════════════════ */
+#hero {
+  min-height: 100vh;
+  display: grid; grid-template-columns: 1.05fr 0.95fr;
+  padding: 0 4rem; padding-top: 64px;
+  position: relative; overflow: hidden;
+  background: var(--bg);
+}
+
+/* Blueprint grid — subtle */
+#hero::after {
+  content: '';
+  position: absolute; inset: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(127,168,196,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(127,168,196,0.03) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+/* Ambient glow top-left */
+#hero::before {
+  content: '';
+  position: absolute; top: -15%; left: -8%; width: 60%; height: 70%;
+  background: radial-gradient(ellipse, rgba(127,168,196,0.06) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.hero-l {
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 5rem 5rem 5rem 0; position: relative; z-index: 2;
+}
+
+.hero-eyebrow {
+  font-family: var(--mono);
+  font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--blue3); margin-bottom: 2.5rem;
+  display: flex; align-items: center; gap: 0.75rem;
+}
+.hero-eyebrow::before {
+  content: ''; display: block; width: 28px; height: 1px; background: var(--blue3);
+}
+
+h1.hero-name {
+  font-family: var(--display);
+  font-size: clamp(2.8rem, 5vw, 4.5rem);
+  font-weight: 400; line-height: 1.05; letter-spacing: -0.01em;
+  color: var(--t1); margin-bottom: 0.15em;
+}
+h1.hero-name em {
+  display: block; font-style: italic; color: var(--blue2); font-weight: 400;
+}
+
+.hero-role {
+  font-family: var(--mono);
+  font-size: 0.67rem; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--t3); margin: 2.25rem 0;
+  display: flex; align-items: center; gap: 1rem;
+}
+.hero-role::before {
+  content: ''; display: block; width: 32px; height: 1.5px; background: var(--blue);
+}
+
+.hero-tag {
+  font-size: 1rem; font-weight: 300; color: var(--t2);
+  line-height: 1.85; max-width: 480px; margin-bottom: 3rem;
+}
+.hero-tag strong { color: var(--t1); font-weight: 400; }
+
+.hero-btns { display: flex; gap: 0.8rem; flex-wrap: wrap; }
+
+.btn-solid {
+  font-family: var(--mono);
+  font-size: 0.63rem; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 0.85rem 1.8rem;
+  background: var(--blue); color: var(--bg);
+  border: none; border-radius: 4px;
+  cursor: none; text-decoration: none;
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  font-weight: 500; transition: all .25s;
+}
+.btn-solid:hover {
+  background: var(--blue2); transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(127,168,196,0.22);
+}
+
+.btn-outline {
+  font-family: var(--mono);
+  font-size: 0.63rem; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 0.85rem 1.8rem;
+  background: transparent; color: var(--t2);
+  border: 1px solid var(--ln2); border-radius: 4px;
+  cursor: none; text-decoration: none;
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  transition: all .25s;
+}
+.btn-outline:hover { border-color: var(--blue); color: var(--blue2); background: var(--blue-t2); }
+
+/* HERO RIGHT */
+.hero-r {
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 5rem 0 5rem 4rem;
+  border-left: 1px solid var(--ln);
+  position: relative; z-index: 2;
+}
+
+.metrics-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 0; border: 1px solid var(--ln); margin-bottom: 3rem;
+}
+.met {
+  padding: 2rem 1.75rem;
+  border-right: 1px solid var(--ln); border-bottom: 1px solid var(--ln);
+  transition: background .35s; position: relative; overflow: hidden;
+}
+.met:nth-child(2n) { border-right: none; }
+.met:nth-last-child(-n+2) { border-bottom: none; }
+.met:hover { background: var(--bg4); }
+.met::after {
+  content: ''; position: absolute; top:0; left:0; right:0; height:1.5px;
+  background: var(--blue); transform: scaleX(0); transform-origin: left;
+  transition: transform .4s ease;
+}
+.met:hover::after { transform: scaleX(1); }
+
+.met-val {
+  font-family: var(--display);
+  font-size: 2.4rem; font-weight: 400; font-style: italic;
+  color: var(--t1); line-height: 1; margin-bottom: 0.3rem;
+}
+.met-val sup { font-size: 1rem; color: var(--blue2); font-style: normal; vertical-align: super; }
+.met-label {
+  font-family: var(--mono);
+  font-size: 0.57rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--t4);
+}
+
+.cert-strip { display: flex; flex-direction: column; gap: 0; }
+.cert-item {
+  display: flex; align-items: flex-start; gap: 0.8rem;
+  padding: 0.85rem 0; border-bottom: 1px solid var(--ln);
+}
+.cert-item:last-child { border-bottom: none; }
+.cert-dot {
+  width: 4px; height: 4px; border-radius: 50%;
+  background: var(--blue2); flex-shrink: 0; margin-top: 0.45rem;
+}
+.cert-label {
+  font-family: var(--mono);
+  font-size: 0.57rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--blue3); margin-bottom: 0.15rem; display: block;
+}
+.cert-val { font-size: 0.8rem; font-weight: 300; color: var(--t2); line-height: 1.4; }
+
+/* ══════════════════════════
+   SECTION WRAPPER
+══════════════════════════ */
+.wrap { max-width: 1160px; margin: 0 auto; padding: 7rem 4rem; }
+
+.sh {
+  display: flex; align-items: baseline; justify-content: space-between;
+  padding-bottom: 1.4rem; margin-bottom: 4.5rem;
+  border-bottom: 1px solid var(--ln);
+}
+.sh-idx { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.15em; color: var(--blue3); }
+.sh-title {
+  font-family: var(--display);
+  font-size: clamp(1.7rem, 3.5vw, 2.6rem);
+  font-weight: 400; font-style: italic; color: var(--t1); letter-spacing: -0.01em;
+}
+.sh-sub {
+  font-family: var(--mono); font-size: 0.57rem; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--t4);
+}
+
+/* ══════════════════════════
+   ABOUT
+══════════════════════════ */
+#about { background: var(--bg2); border-top: 1px solid var(--ln); }
+
+.about-grid {
+  display: grid; grid-template-columns: 1.15fr 1fr;
+  gap: 5rem; align-items: start;
+}
+
+.about-body {
+  font-size: 1rem; font-weight: 300; color: var(--t2); line-height: 1.9;
+}
+.about-body p { margin-bottom: 1.5rem; }
+.about-body strong { color: var(--t1); font-weight: 400; }
+.about-body em { color: var(--blue2); font-style: italic; }
+
+.method-list { display: flex; flex-direction: column; }
+.method-item {
+  padding: 1.5rem 0 1.5rem 1.25rem;
+  border-bottom: 1px solid var(--ln);
+  border-left: 2px solid transparent;
+  transition: all .3s;
+}
+.method-item:hover {
+  border-left-color: var(--blue); background: var(--blue-t2);
+  padding-left: 1.75rem;
+}
+.method-num {
+  font-family: var(--mono);
+  font-size: 0.57rem; letter-spacing: 0.1em; color: var(--blue3); margin-bottom: 0.35rem;
+}
+.method-title {
+  font-family: var(--display);
+  font-size: 0.95rem; font-weight: 400;
+  color: var(--t1); margin-bottom: 0.3rem;
+}
+.method-desc { font-size: 0.8rem; color: var(--t3); font-weight: 300; line-height: 1.6; }
+
+/* ══════════════════════════
+   EXPERTISE
+══════════════════════════ */
+#expertise { background: var(--bg); border-top: 1px solid var(--ln); }
+
+.exp-grid {
+  display: grid; grid-template-columns: repeat(3,1fr);
+  gap: 0; border: 1px solid var(--ln);
+}
+.exp-card {
+  padding: 2.25rem 2rem;
+  border-right: 1px solid var(--ln); border-bottom: 1px solid var(--ln);
+  transition: background .35s; position: relative; overflow: hidden;
+}
+.exp-card:nth-child(3n) { border-right: none; }
+.exp-card:nth-child(n+4) { border-bottom: none; }
+.exp-card:hover { background: var(--bg4); }
+.exp-card::after {
+  content: ''; position: absolute; bottom:0; left:0; right:0; height:1.5px;
+  background: linear-gradient(90deg, var(--blue), transparent);
+  transform: scaleX(0); transform-origin: left; transition: transform .45s ease;
+}
+.exp-card:hover::after { transform: scaleX(1); }
+
+.exp-icon {
+  font-family: var(--mono); font-size: 0.57rem; letter-spacing: 0.15em;
+  text-transform: uppercase; color: var(--blue3); margin-bottom: 1rem;
+}
+.exp-title {
+  font-family: var(--display);
+  font-size: 0.98rem; font-weight: 400; color: var(--t1);
+  margin-bottom: 0.55rem; line-height: 1.3;
+}
+.exp-desc { font-size: 0.8rem; color: var(--t2); font-weight: 300; line-height: 1.65; margin-bottom: 1.1rem; }
+.exp-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.exp-tag {
+  font-family: var(--mono); font-size: 0.56rem; letter-spacing: 0.05em;
+  padding: 0.18rem 0.45rem; border: 1px solid var(--ln2); color: var(--t3);
+  transition: all .2s;
+}
+.exp-tag:hover { border-color: var(--blue3); color: var(--blue2); }
+
+/* ══════════════════════════
+   CASES
+══════════════════════════ */
+#cases { background: var(--bg2); border-top: 1px solid var(--ln); }
+
+.cases-list { display: flex; flex-direction: column; }
+.case-row {
+  display: grid; grid-template-columns: 190px 1fr 175px;
+  gap: 4rem; align-items: start;
+  padding: 3rem 0; border-bottom: 1px solid var(--ln);
+  position: relative; overflow: hidden; transition: all .3s;
+}
+.case-row:hover { background: var(--bg4); padding-left: 0.75rem; padding-right: 0.75rem; margin: 0 -0.75rem; }
+.case-row::before {
+  content: ''; position: absolute; top:0; left:0; right:0; height:1px;
+  background: linear-gradient(90deg, var(--blue3), transparent);
+  transform: scaleX(0); transform-origin: left; transition: transform .5s ease;
+}
+.case-row:hover::before { transform: scaleX(1); }
+
+.case-meta {}
+.case-org {
+  font-family: var(--display); font-size: 0.95rem; font-weight: 400;
+  color: var(--t1); margin-bottom: 0.25rem;
+}
+.case-period {
+  font-family: var(--mono); font-size: 0.57rem; letter-spacing: 0.1em;
+  color: var(--blue3); margin-bottom: 0.6rem;
+}
+.case-badge {
+  display: inline-block; font-family: var(--mono);
+  font-size: 0.52rem; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 0.18rem 0.45rem; background: var(--blue-t); border: 1px solid var(--ln3);
+  color: var(--blue);
+}
+
+.case-body {}
+.case-title {
+  font-family: var(--display); font-weight: 400; font-style: italic;
+  font-size: 1rem; color: var(--t1); margin-bottom: 1rem; line-height: 1.4;
+}
+.case-list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+.case-list li {
+  font-size: 0.82rem; font-weight: 300; color: var(--t2);
+  display: flex; gap: 0.75rem; line-height: 1.55;
+}
+.case-list li::before {
+  content: '—'; font-family: var(--mono); font-size: 0.6rem;
+  color: var(--blue3); flex-shrink: 0; padding-top: 0.18rem;
+}
+
+.case-result {
+  padding: 1.15rem; background: var(--blue-t); border: 1px solid var(--ln3);
+  display: flex; flex-direction: column; gap: 0.5rem; align-self: start;
+}
+.cr-label {
+  font-family: var(--mono); font-size: 0.52rem; letter-spacing: 0.15em;
+  text-transform: uppercase; color: var(--blue3); margin-bottom: 0.15rem;
+}
+.cr-item {
+  font-size: 0.78rem; color: var(--t2); font-weight: 300;
+  display: flex; align-items: flex-start; gap: 0.4rem; line-height: 1.4;
+}
+.cr-item b { color: var(--blue2); font-family: var(--mono); font-size: 0.65rem; font-weight: 400; }
+
+/* ══════════════════════════
+   TIMELINE
+══════════════════════════ */
+#timeline { background: var(--bg); border-top: 1px solid var(--ln); }
+
+.tl { display: flex; flex-direction: column; }
+.tl-item {
+  display: grid; grid-template-columns: 190px 1fr;
+  gap: 4rem; padding: 2.5rem 0; border-bottom: 1px solid var(--ln);
+  transition: background .3s;
+}
+.tl-item:hover { background: var(--bg4); }
+.tl-item:last-child { border-bottom: none; }
+
+.tl-meta {}
+.tl-period {
+  font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.1em;
+  color: var(--t3); line-height: 1.6;
+}
+.tl-current-badge {
+  display: inline-block; margin-top: 0.4rem;
+  font-family: var(--mono); font-size: 0.52rem; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--blue2);
+  border-bottom: 1px solid var(--blue3);
+}
+
+.tl-body {}
+.tl-company {
+  font-family: var(--display); font-size: 1rem; font-weight: 400;
+  color: var(--t1); margin-bottom: 0.2rem;
+}
+.tl-role { font-size: 0.82rem; color: var(--blue2); font-weight: 400; margin-bottom: 0.55rem; }
+.tl-desc { font-size: 0.8rem; color: var(--t3); font-weight: 300; line-height: 1.65; }
+
+/* ══════════════════════════
+   CONTACT
+══════════════════════════ */
+#contact {
+  background: var(--bgdark);
+  border-top: 1px solid var(--ln);
+}
+.contact-inner {
+  max-width: 1160px; margin: 0 auto; padding: 7rem 4rem;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 7rem; align-items: center;
+}
+
+.ct-head {
+  font-family: var(--display);
+  font-size: clamp(2rem, 3.5vw, 3rem);
+  font-weight: 400; line-height: 1.15; letter-spacing: -0.01em;
+  color: var(--t1); margin-bottom: 1.25rem;
+}
+.ct-head em { font-style: italic; color: var(--blue2); }
+.ct-sub { font-size: 0.88rem; font-weight: 300; color: var(--t3); line-height: 1.85; }
+
+.ct-list { display: flex; flex-direction: column; }
+.ct-link {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.35rem 0; border-bottom: 1px solid rgba(245,239,230,0.06);
+  text-decoration: none; color: var(--t2);
+  font-size: 0.88rem; font-weight: 300;
+  transition: all .3s; position: relative;
+}
+.ct-link::before {
+  content: ''; position: absolute; left:0; top:0; bottom:0;
+  width: 1.5px; background: var(--blue);
+  transform: scaleY(0); transform-origin: top; transition: transform .3s;
+}
+.ct-link:hover { color: var(--t1); padding-left: 0.75rem; }
+.ct-link:hover::before { transform: scaleY(1); }
+.ct-label {
+  font-family: var(--mono); font-size: 0.55rem; letter-spacing: 0.15em;
+  text-transform: uppercase; color: var(--blue3); margin-bottom: 0.2rem; display: block;
+}
+.ct-arrow { color: var(--blue3); transition: transform .3s; }
+.ct-link:hover .ct-arrow { transform: translateX(4px); }
+
+/* ══════════════════════════
+   FOOTER
+══════════════════════════ */
+footer {
+  background: var(--bgdark);
+  border-top: 1px solid rgba(255,255,255,0.04);
+  padding: 1.5rem 4rem;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.foot-l { font-family: var(--mono); font-size: 0.56rem; letter-spacing: 0.1em; color: var(--t4); }
+.foot-r { font-family: var(--mono); font-size: 0.56rem; letter-spacing: 0.12em; color: var(--blue3); }
+
+/* ══════════════════════════
+   REVEAL
+══════════════════════════ */
+.rv {
+  opacity: 0; transform: translateY(26px);
+  transition: opacity .8s cubic-bezier(.25,.46,.45,.94),
+              transform .8s cubic-bezier(.25,.46,.45,.94);
+}
+.rv.on { opacity:1; transform:translateY(0); }
+.rv.d1 { transition-delay:.1s; }
+.rv.d2 { transition-delay:.2s; }
+.rv.d3 { transition-delay:.3s; }
+
+/* ══════════════════════════
+   PRINT
+══════════════════════════ */
+@media print {
+  nav, #plane-wrap, #plane-trail, #prog, body::before { display:none !important; }
+  body { background:#fff !important; color:#111 !important; cursor:default; }
+  * { transition:none !important; animation:none !important; }
+  #hero { grid-template-columns:1fr; padding:1rem; background:#fff; }
+  .hero-r { border-left:none; padding-left:0; padding-top:0; }
+  .wrap, .contact-inner { padding:1.5rem 0; }
+  .about-grid, .contact-inner { grid-template-columns:1fr; gap:2rem; }
+  .case-row { grid-template-columns:140px 1fr; gap:2rem; }
+  .case-result { display:none; }
+  .tl-item { grid-template-columns:140px 1fr; gap:2rem; }
+  #contact, footer { background:#fff !important; }
+  .ct-head, .ct-sub, .ct-link, .foot-l, .foot-r { color:#111 !important; }
+  #hero::before, #hero::after { display:none; }
+}
+
+/* ══════════════════════════
+   RESPONSIVE
+══════════════════════════ */
+@media (max-width: 960px) {
+  nav { padding:0 1.5rem; }
+  .nav-links { display:none; }
+  #hero { grid-template-columns:1fr; padding:1.5rem; padding-top:88px; }
+  .hero-l { padding:3rem 0; }
+  .hero-r { border-left:none; padding:0; border-top:1px solid var(--ln); padding-top:2.5rem; }
+  .wrap { padding:4rem 1.5rem; }
+  .about-grid { grid-template-columns:1fr; gap:3rem; }
+  .exp-grid { grid-template-columns:1fr 1fr; }
+  .exp-card:nth-child(2n) { border-right:none; }
+  .exp-card:nth-child(3n) { border-right:1px solid var(--ln); }
+  .exp-card:nth-child(n+5) { border-bottom:none; }
+  .case-row { grid-template-columns:1fr; gap:1.5rem; }
+  .tl-item { grid-template-columns:1fr; gap:0.35rem; }
+  .contact-inner { grid-template-columns:1fr; gap:3rem; padding:3.5rem 1.5rem; }
+  footer { padding:1.25rem 1.5rem; flex-direction:column; gap:0.4rem; text-align:center; }
+  .sh { flex-direction:column; gap:0.3rem; }
+}
+@media (max-width:480px) {
+  .hero-name { font-size:2.3rem; }
+  .metrics-grid { grid-template-columns:1fr 1fr; }
+  .exp-grid { grid-template-columns:1fr; }
+  .exp-card { border-right:none !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- PLANE CURSOR -->
+<div id="plane-wrap">
+  <div id="plane-inner">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+      <path d="M22 2L11 13" stroke="#9bbfd6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="#9bbfd6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="rgba(127,168,196,0.12)"/>
+    </svg>
+  </div>
+</div>
+<div id="plane-trail"></div>
+<div id="prog"></div>
+
+<!-- NAVIGATION — no wordmark -->
+<nav>
+  <ul class="nav-links">
+    <li><a href="#about">Подход</a></li>
+    <li><a href="#expertise">Экспертиза</a></li>
+    <li><a href="#cases">Проекты</a></li>
+    <li><a href="#timeline">Карьера</a></li>
+    <li><a href="#contact">Контакт</a></li>
+  </ul>
+  <button class="nav-pdf" onclick="window.print()">↓ PDF</button>
+</nav>
+
+<!-- ═══════ HERO ═══════ -->
+<section id="hero">
+
+  <div class="hero-l">
+    <div class="hero-eyebrow">ПАО «Ил» · Дивизион транспортной авиации</div>
+
+    <h1 class="hero-name">
+      Михаил
+      <em>Волков</em>
+    </h1>
+
+    <div class="hero-role">Метрология · Качество · Авиация</div>
+
+    <p class="hero-tag">
+      Обеспечиваю <strong>точность измерений и соответствие стандартам</strong> в авиационном производстве —
+      от аккредитации испытательных лабораторий до метрологического надзора в масштабах дивизиона.
+    </p>
+
+    <div class="hero-btns">
+      <a href="mailto:VolkovMI@ilyushin.ru" class="btn-solid">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        Написать
+      </a>
+      <button class="btn-outline" onclick="window.print()">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Сохранить PDF
+      </button>
+    </div>
+  </div>
+
+  <div class="hero-r">
+    <div class="metrics-grid">
+      <div class="met">
+        <div class="met-val">7<sup>+</sup></div>
+        <div class="met-label">Лет в отрасли</div>
+      </div>
+      <div class="met">
+        <div class="met-val" style="font-size:1.5rem;font-style:normal;">ПАО «Ил»</div>
+        <div class="met-label">С 2019 года</div>
+      </div>
+      <div class="met">
+        <div class="met-val" style="font-size:1.5rem;font-style:normal;">ДТА</div>
+        <div class="met-label">Уровень надзора</div>
+      </div>
+      <div class="met">
+        <div class="met-val" style="font-size:1.5rem;font-style:normal;">ISO</div>
+        <div class="met-label">17025 · ФАП-21</div>
+      </div>
+    </div>
+
+    <div class="cert-strip">
+      <div class="cert-item">
+        <div class="cert-dot"></div>
+        <div>
+          <span class="cert-label">Сертификация</span>
+          <span class="cert-val">УЗ-метод неразрушающего контроля (2026)</span>
+        </div>
+      </div>
+      <div class="cert-item">
+        <div class="cert-dot"></div>
+        <div>
+          <span class="cert-label">Образование</span>
+          <span class="cert-val">МАИ · Метрология и метрологическое обеспечение · 2020</span>
+        </div>
+      </div>
+      <div class="cert-item">
+        <div class="cert-dot"></div>
+        <div>
+          <span class="cert-label">Стандарты</span>
+          <span class="cert-val">ГОСТ 8.568 · ГОСТ РВ 0008-002 · ISO 17025 · ФАП-21</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ═══════ ABOUT ═══════ -->
+<section id="about">
+  <div class="wrap">
+    <div class="sh rv">
+      <div>
+        <div class="sh-idx">01 //</div>
+        <h2 class="sh-title">Подход к работе</h2>
+      </div>
+      <div class="sh-sub">About</div>
+    </div>
+
+    <div class="about-grid">
+      <div class="about-body rv">
+        <p>Занимаюсь метрологическим обеспечением авиационного производства с 2019 года. За это время прошёл путь от инженера до руководителя направления по управлению оборудованием для мониторинга и измерений в Дивизионе транспортной авиации ПАО «Ил».</p>
+        <p>Специализируюсь на <strong>аккредитации испытательных лабораторий</strong> по ISO/IEC 17025 и ФАП-21, разработке нормативно-технической документации, организации метрологического надзора. Умею выстраивать систему от нуля — формировать пакет документации, согласовывать с ГНМЦ, запускать в работу.</p>
+        <p>В 2026 году получил <em>сертификацию по ультразвуковому методу неразрушающего контроля</em> и начал вести курсы повышения квалификации по направлениям метрологии и аттестации испытательного оборудования.</p>
+      </div>
+
+      <div class="method-list rv d2">
+        <div class="method-item">
+          <div class="method-num">01 //</div>
+          <div class="method-title">Документация как основа</div>
+          <div class="method-desc">Любой процесс начинается с корректно разработанной НТД. Разрабатываю СТО, программы и методики, регламенты — так, чтобы они работали, а не лежали в папке.</div>
+        </div>
+        <div class="method-item">
+          <div class="method-num">02 //</div>
+          <div class="method-title">Системный контроль</div>
+          <div class="method-desc">Организую метрологический надзор в организации и филиалах с чёткими точками контроля, графиками и ответственными.</div>
+        </div>
+        <div class="method-item">
+          <div class="method-num">03 //</div>
+          <div class="method-title">Передача знаний</div>
+          <div class="method-desc">Провожу курсы повышения квалификации. Грамотный персонал — лучшая система качества.</div>
+        </div>
+        <div class="method-item">
+          <div class="method-num">04 //</div>
+          <div class="method-title">Точность в деталях</div>
+          <div class="method-desc">В метрологии нет мелочей. Каждое несоответствие — потенциальный риск. Работаю на опережение, а не на устранение последствий.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ EXPERTISE ═══════ -->
+<section id="expertise">
+  <div class="wrap">
+    <div class="sh rv">
+      <div>
+        <div class="sh-idx">02 //</div>
+        <h2 class="sh-title">Области экспертизы</h2>
+      </div>
+      <div class="sh-sub">Expertise</div>
+    </div>
+
+    <div class="exp-grid rv">
+      <div class="exp-card">
+        <div class="exp-icon">01 · Аккредитация</div>
+        <div class="exp-title">Испытательные лаборатории</div>
+        <div class="exp-desc">Разработка пакета документации и сопровождение аккредитации по ISO/IEC 17025 и ФАП-21. От первичного аудита до получения аттестата.</div>
+        <div class="exp-tags"><span class="exp-tag">ISO 17025</span><span class="exp-tag">ФАП-21</span><span class="exp-tag">ГНМЦ</span></div>
+      </div>
+      <div class="exp-card">
+        <div class="exp-icon">02 · Аттестация</div>
+        <div class="exp-title">Испытательное оборудование</div>
+        <div class="exp-desc">Полный цикл аттестации ИО: формирование приказов, разработка программ и методик, проведение, оформление протоколов и аттестатов.</div>
+        <div class="exp-tags"><span class="exp-tag">ГОСТ 8.568</span><span class="exp-tag">РВ 0008-002</span></div>
+      </div>
+      <div class="exp-card">
+        <div class="exp-icon">03 · Надзор</div>
+        <div class="exp-title">Метрологический надзор</div>
+        <div class="exp-desc">Организация и проведение внутреннего и внешнего метрологического надзора в организации и её филиалах. Контроль устранения несоответствий.</div>
+        <div class="exp-tags"><span class="exp-tag">Надзор</span><span class="exp-tag">ДТА</span><span class="exp-tag">Филиалы</span></div>
+      </div>
+      <div class="exp-card">
+        <div class="exp-icon">04 · Обеспечение</div>
+        <div class="exp-title">Метрологическое обеспечение</div>
+        <div class="exp-desc">Управление парком СИ: учёт, поверка, калибровка, ввод/вывод из эксплуатации. Разработка графиков и перечней ОМИ. Единая политика измерений.</div>
+        <div class="exp-tags"><span class="exp-tag">Поверка СИ</span><span class="exp-tag">База ОМИ</span><span class="exp-tag">ЕПОЗ</span></div>
+      </div>
+      <div class="exp-card">
+        <div class="exp-icon">05 · НК</div>
+        <div class="exp-title">Неразрушающий контроль</div>
+        <div class="exp-desc">Сертифицированный специалист по ультразвуковому методу НК (2026). Применение методов контроля в условиях авиационного производства.</div>
+        <div class="exp-tags"><span class="exp-tag">УЗ-метод</span><span class="exp-tag">Сертификат НК</span></div>
+      </div>
+      <div class="exp-card">
+        <div class="exp-icon">06 · Обучение</div>
+        <div class="exp-title">Курсы повышения квалификации</div>
+        <div class="exp-desc">Ведение курсов: метрологическое обеспечение производства, аттестация ИО, применение ГОСТ ИСО МЭК 17025.</div>
+        <div class="exp-tags"><span class="exp-tag">Преподавание</span><span class="exp-tag">ПК-курсы</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ CASES ═══════ -->
+<section id="cases">
+  <div class="wrap">
+    <div class="sh rv">
+      <div>
+        <div class="sh-idx">03 //</div>
+        <h2 class="sh-title">Ключевые проекты</h2>
+      </div>
+      <div class="sh-sub">Cases</div>
+    </div>
+
+    <div class="cases-list">
+      <div class="case-row rv">
+        <div class="case-meta">
+          <div class="case-org">ПАО «Ил»</div>
+          <div class="case-period">2021 — 2026</div>
+          <div class="case-badge">Аккредитация ИЛ</div>
+        </div>
+        <div class="case-body">
+          <div class="case-title">Аккредитация ИЛ ресурсных и статических испытаний по ISO 17025 и ФАП-21</div>
+          <ul class="case-list">
+            <li><span>Разработал полный пакет документации и процедуры для аккредитации по требованиям ГОСТ ИСО МЭК 17025</span></li>
+            <li><span>Организовал одобрение ИЛ по ФАП-21 — с нуля до положительного экспертного заключения</span></li>
+            <li><span>Сформировал пакет документов для получения заключения ГНМЦ на право проведения аттестации ИО по ГОСТ РВ 0008-002</span></li>
+          </ul>
+        </div>
+        <div class="case-result">
+          <div class="cr-label">Результат</div>
+          <div class="cr-item"><b>✓</b> Аккредитация получена</div>
+          <div class="cr-item"><b>✓</b> Одобрение по ФАП-21</div>
+          <div class="cr-item"><b>✓</b> Заключение ГНМЦ</div>
+        </div>
+      </div>
+
+      <div class="case-row rv">
+        <div class="case-meta">
+          <div class="case-org">ПАО «Ил»</div>
+          <div class="case-period">2020 — н.в.</div>
+          <div class="case-badge">Политика ДТА</div>
+        </div>
+        <div class="case-body">
+          <div class="case-title">Единая техническая политика ДТА в области обеспечения единства измерений</div>
+          <ul class="case-list">
+            <li><span>Реализовал единую отраслевую политику точности измерений в Дивизионе транспортной авиации</span></li>
+            <li><span>Разработал серию СТО; выстроил систему внутреннего и внешнего метрологического надзора в организации и филиалах</span></li>
+            <li><span>Организовал договорную работу по метрологическому обеспечению в соответствии с требованиями ЕПОЗ</span></li>
+          </ul>
+        </div>
+        <div class="case-result">
+          <div class="cr-label">Результат</div>
+          <div class="cr-item"><b>✓</b> СТО введены в действие</div>
+          <div class="cr-item"><b>✓</b> Надзор по всем филиалам</div>
+          <div class="cr-item"><b>✓</b> Политика ДТА внедрена</div>
+        </div>
+      </div>
+
+      <div class="case-row rv">
+        <div class="case-meta">
+          <div class="case-org">ПАО «Ил»</div>
+          <div class="case-period">2019 — н.в.</div>
+          <div class="case-badge">Аттестация ИО</div>
+        </div>
+        <div class="case-body">
+          <div class="case-title">Система аттестации испытательного оборудования по ГОСТ 8.568 и РВ 0008-002</div>
+          <ul class="case-list">
+            <li><span>Выстроил полный цикл аттестации: приказы, программы и методики, проведение, оформление протоколов и аттестатов</span></li>
+            <li><span>Разработал и согласовал календарные графики аттестации; установил периодичность проверок средств контроля</span></li>
+            <li><span>Внедрил новую НТД в части метрологического обеспечения единства измерений</span></li>
+          </ul>
+        </div>
+        <div class="case-result">
+          <div class="cr-label">Результат</div>
+          <div class="cr-item"><b>✓</b> Система аттестации ИО</div>
+          <div class="cr-item"><b>↓</b> Несоответствия при надзоре</div>
+          <div class="cr-item"><b>✓</b> НТД внедрена</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ TIMELINE ═══════ -->
+<section id="timeline">
+  <div class="wrap">
+    <div class="sh rv">
+      <div>
+        <div class="sh-idx">04 //</div>
+        <h2 class="sh-title">Карьерный путь</h2>
+      </div>
+      <div class="sh-sub">Career</div>
+    </div>
+
+    <div class="tl rv">
+      <div class="tl-item">
+        <div class="tl-meta">
+          <div class="tl-period">Янв 2021 — н.в.</div>
+          <span class="tl-current-badge">текущая позиция</span>
+        </div>
+        <div class="tl-body">
+          <div class="tl-company">ПАО «Ил»</div>
+          <div class="tl-role">Руководитель направления по управлению оборудованием для мониторинга и измерений в ДТА</div>
+          <div class="tl-desc">Организация метрологического надзора в ДТА. Аккредитация ИЛ по ISO 17025 и ФАП-21. Аттестация ИО. Внедрение НТД. Договорная работа по ЕПОЗ.</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-meta"><div class="tl-period">Март 2020 — Янв 2021</div></div>
+        <div class="tl-body">
+          <div class="tl-company">ПАО «Ил»</div>
+          <div class="tl-role">Ведущий инженер</div>
+          <div class="tl-desc">Единая техническая политика ДТА в области измерений. Метрологическая экспертиза документации. Разработка серии СТО. Организация надзора.</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-meta"><div class="tl-period">Март 2019 — Март 2020</div></div>
+        <div class="tl-body">
+          <div class="tl-company">ПАО «Ил»</div>
+          <div class="tl-role">Инженер 2 — 1 категории</div>
+          <div class="tl-desc">Управление ОМИ: учёт, поверка, калибровка. Ведение электронной базы данных. Контроль несоответствий по результатам метрологического надзора.</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-meta"><div class="tl-period">2018 — 2019</div></div>
+        <div class="tl-body">
+          <div class="tl-company">ЦПКТ АТ «МАИ»</div>
+          <div class="tl-role">Техник → Инженер-конструктор</div>
+          <div class="tl-desc">Разработка КД по Ил-76, Ил-112. 3D-моделирование в NX. Формирование извещений об изменениях.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ CONTACT ═══════ -->
+<div id="contact">
+  <div class="contact-inner">
+    <div class="rv">
+      <h2 class="ct-head">Обсудим<br><em>задачу?</em></h2>
+      <p class="ct-sub">Готов к предметному разговору по вопросам метрологического обеспечения, аккредитации лабораторий и контроля качества в авиационной промышленности.</p>
+    </div>
+    <div class="ct-list rv d2">
+      <a href="mailto:VolkovMI@ilyushin.ru" class="ct-link">
+        <div><span class="ct-label">Рабочий email</span>VolkovMI@ilyushin.ru</div>
+        <span class="ct-arrow">→</span>
+      </a>
+      <a href="tel:+79853686542" class="ct-link">
+        <div><span class="ct-label">Телефон</span>+7 (985) 368-65-42</div>
+        <span class="ct-arrow">→</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="foot-l">© 2026 Волков Михаил Игоревич</div>
+  <div class="foot-r">Метрология · Авиация · Качество</div>
+</footer>
+
+<script>
+/* ══════════════════════════════════════
+   SMOOTH PAPER PLANE CURSOR
+   Spring physics: plane lags behind mouse
+   Rotation: follows actual movement vector
+══════════════════════════════════════ */
+const planeWrap  = document.getElementById('plane-wrap');
+const planeInner = document.getElementById('plane-inner');
+const trail      = document.getElementById('plane-trail');
+
+// Current and target positions
+let tx = window.innerWidth / 2, ty = window.innerHeight / 2; // target (mouse)
+let cx = tx, cy = ty;    // current (lagged)
+let vx = 0, vy = 0;      // velocity
+
+// Trail lags further behind
+let trx = tx, try_ = ty;
+
+// Spring constants
+const SPRING    = 0.10;  // stiffness (lower = more lag)
+const DAMPING   = 0.72;  // friction  (lower = more bounce)
+const TRAIL_LAG = 0.06;
+
+let currentAngle = -35; // initial angle
+let targetAngle  = -35;
+let isHovering   = false;
+
+document.addEventListener('mousemove', e => {
+  tx = e.clientX;
+  ty = e.clientY;
+});
+
+function lerp(a, b, t) { return a + (b - a) * t; }
+
+function animate() {
+  // Spring toward mouse
+  const fx = (tx - cx) * SPRING;
+  const fy = (ty - cy) * SPRING;
+
+  vx = vx * DAMPING + fx;
+  vy = vy * DAMPING + fy;
+
+  const prevCx = cx, prevCy = cy;
+  cx += vx;
+  cy += vy;
+
+  // Trail lags more
+  trx = lerp(trx, cx, TRAIL_LAG);
+  try_ = lerp(try_, cy, TRAIL_LAG);
+
+  // Rotation: angle from velocity vector
+  const speed = Math.sqrt(vx * vx + vy * vy);
+  if (speed > 0.4 && !isHovering) {
+    targetAngle = Math.atan2(vy, vx) * (180 / Math.PI) - 35;
+  }
+  currentAngle = lerp(currentAngle, targetAngle, 0.08);
+
+  // Apply positions
+  planeWrap.style.left = cx + 'px';
+  planeWrap.style.top  = cy + 'px';
+  planeWrap.style.transform = 'translate(-12px, -12px)';
+
+  if (!isHovering) {
+    planeInner.style.transform = `rotate(${currentAngle}deg)`;
+  }
+
+  trail.style.left = (trx - 2) + 'px';
+  trail.style.top  = (try_ - 2) + 'px';
+
+  requestAnimationFrame(animate);
+}
+animate();
+
+// Hover states
+document.querySelectorAll('a, button, .met, .exp-card, .case-row, .tl-item, .method-item').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    isHovering = true;
+    planeInner.classList.add('hover');
+    planeInner.style.transform = `rotate(-35deg) scale(1.35)`;
+  });
+  el.addEventListener('mouseleave', () => {
+    isHovering = false;
+    planeInner.classList.remove('hover');
+  });
+});
+
+/* ══════════════════════════
+   SCROLL PROGRESS
+══════════════════════════ */
+const prog = document.getElementById('prog');
+window.addEventListener('scroll', () => {
+  const ratio = window.scrollY / (document.body.scrollHeight - innerHeight);
+  prog.style.transform = `scaleX(${ratio})`;
+}, { passive: true });
+
+/* ══════════════════════════
+   REVEAL ON SCROLL
+══════════════════════════ */
+const revObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      // Stagger siblings
+      const siblings = [...e.target.parentElement.children]
+        .filter(c => c.classList.contains('rv'));
+      siblings.forEach((s, i) => setTimeout(() => s.classList.add('on'), i * 90));
+      e.target.classList.add('on');
+      revObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.07, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.rv').forEach(el => revObs.observe(el));
+
+/* ══════════════════════════
+   ACTIVE NAV LINK
+══════════════════════════ */
+const allSections = document.querySelectorAll('section[id], div[id]');
+const navLinks    = document.querySelectorAll('.nav-links a');
+
+const navObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      navLinks.forEach(l => {
+        l.classList.toggle('active', l.getAttribute('href') === '#' + e.target.id);
+      });
+    }
+  });
+}, { threshold: 0.3 });
+
+allSections.forEach(s => navObs.observe(s));
+
+/* ══════════════════════════
+   SMOOTH SCROLL
+══════════════════════════ */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
+  });
+});
+</script>
+</body>
+</html>

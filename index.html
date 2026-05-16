@@ -1019,19 +1019,18 @@ let targetAngle  = -35;
 let isHovering   = false;
 
 document.addEventListener('mousemove', e => {
-  tx = e.clientX;
-  ty = e.clientY;
+ px = e.clientX;
+py = e.clientY;
 });
 
 function lerp(a, b, t) { return a + (b - a) * t; }
 
 function animate() {
   // Spring toward mouse
-  const fx = (tx - cx) * SPRING;
-  const fy = (ty - cy) * SPRING;
-
-  vx = vx * DAMPING + fx;
-  vy = vy * DAMPING + fy;
+ const IDLE_DELAY = 2000;
+const IDLE_SPEED = 0.004;
+const ORBIT_W    = 0.28;
+const ORBIT_H    = 0.18;
 
   const prevCx = cx, prevCy = cy;
   cx += vx;
@@ -1057,22 +1056,23 @@ function animate() {
     planeInner.style.transform = `rotate(${currentAngle}deg)`;
   }
 
-  trail.style.left = (trx - 2) + 'px';
-  trail.style.top  = (try_ - 2) + 'px';
+idleTimer = setTimeout(() => {
+  isIdle      = true;
+  idleCenterX = px;
+  idleCenterY = py;
+}, IDLE_DELAY);
 
   requestAnimationFrame(animate);
 }
 animate();
 
 // Hover states
-document.querySelectorAll('a, button, .met, .exp-card, .case-row, .tl-item, .method-item').forEach(el => {
-  el.addEventListener('mouseenter', () => {
-    isHovering = true;
-    planeInner.classList.add('hover');
-    planeInner.style.transform = `rotate(-35deg) scale(1.35)`;
-  });
-  el.addEventListener('mouseleave', () => {
-    isHovering = false;
+if (isIdle) {
+  idleT += IDLE_SPEED;
+  ...
+  px = idleCenterX + ...;
+  py = idleCenterY + ...;
+}
     planeInner.classList.remove('hover');
   });
 });
@@ -1080,11 +1080,10 @@ document.querySelectorAll('a, button, .met, .exp-card, .case-row, .tl-item, .met
 /* ══════════════════════════
    SCROLL PROGRESS
 ══════════════════════════ */
-const prog = document.getElementById('prog');
-window.addEventListener('scroll', () => {
-  const ratio = window.scrollY / (document.body.scrollHeight - innerHeight);
-  prog.style.transform = `scaleX(${ratio})`;
-}, { passive: true });
+const dx = px - prevPx;
+const dy = py - prevPy;
+tgtAngle = Math.atan2(dy, dx) * (180/Math.PI);
+curAngle = lerp(curAngle, tgtAngle, 0.10);
 
 /* ══════════════════════════
    REVEAL ON SCROLL

@@ -1025,65 +1025,67 @@ py = e.clientY;
 
 function lerp(a, b, t) { return a + (b - a) * t; }
 
-function animate() {
-  // Spring toward mouse
- const IDLE_DELAY = 2000;
-const IDLE_SPEED = 0.004;
-const ORBIT_W    = 0.28;
-const ORBIT_H    = 0.18;
+/* ── Автопилот ── */
+const IDLE_DELAY = 2000;   // мс без движения → включить автопилот
+const IDLE_SPEED = 0.004;  // угловая скорость (меньше = медленнее)
+const ORBIT_W    = 0.28;   // ширина «8»  как доля ширины экрана
+const ORBIT_H    = 0.18;   // высота «8»  как доля высоты экрана
+ 
+let idleTimer   = null;
+let isIdle      = false;
+let idleT       = 0;          // параметр кривой [0..2π)
+let idleCenterX = px;
+let idleCenterY = py;
 
-  const prevCx = cx, prevCy = cy;
-  cx += vx;
-  cy += vy;
-
-  // Trail lags more
-  trx = lerp(trx, cx, TRAIL_LAG);
-  try_ = lerp(try_, cy, TRAIL_LAG);
-
-  // Rotation: angle from velocity vector
-  const speed = Math.sqrt(vx * vx + vy * vy);
-  if (speed > 0.4 && !isHovering) {
-    targetAngle = Math.atan2(vy, vx) * (180 / Math.PI) - 35;
+  /* ── Трейл ── */
+let trx = px, try_ = py;
+ 
+/* ══ mousemove: самолётик МГНОВЕННО к мыши ══
+   (строка ниже — нет lerp/spring, прямое присвоение) */
+document.addEventListener('mousemove', e => {
+  /* [ИЗМЕНЕНИЕ 1] — прямое присвоение, без пружины */
+  px = e.clientX;
+  py = e.clientY;
+ 
+  /* Сброс автопилота при движении */
+  if (isIdle) {
+    isIdle = false;
+    idleT  = 0;
   }
-  currentAngle = lerp(currentAngle, targetAngle, 0.08);
-
-  // Apply positions
-  planeWrap.style.left = cx + 'px';
-  planeWrap.style.top  = cy + 'px';
-  planeWrap.style.transform = 'translate(-12px, -12px)';
-
-  if (!isHovering) {
-    planeInner.style.transform = `rotate(${currentAngle}deg)`;
-  }
-
-idleTimer = setTimeout(() => {
-  isIdle      = true;
-  idleCenterX = px;
-  idleCenterY = py;
-}, IDLE_DELAY);
-
-  requestAnimationFrame(animate);
-}
-animate();
-
-// Hover states
-if (isIdle) {
-  idleT += IDLE_SPEED;
-  ...
-  px = idleCenterX + ...;
-  py = idleCenterY + ...;
-}
-    planeInner.classList.remove('hover');
-  });
+  clearTimeout(idleTimer);
+  /* [ИЗМЕНЕНИЕ 2] — запуск автопилота через IDLE_DELAY */
+  idleTimer = setTimeout(() => {
+    isIdle      = true;
+    idleCenterX = px;
+    idleCenterY = py;
+  }, IDLE_DELAY);
 });
 
-/* ══════════════════════════
-   SCROLL PROGRESS
-══════════════════════════ */
-const dx = px - prevPx;
-const dy = py - prevPy;
-tgtAngle = Math.atan2(dy, dx) * (180/Math.PI);
-curAngle = lerp(curAngle, tgtAngle, 0.10);
+/* ══ Главный цикл ══ */
+function tick() {
+  /* [ИЗМЕНЕНИЕ 2] — автопилот: lemniscate Бернулли
+     x = a·cos(t) / (1 + sin²(t))
+     y = a·sin(t)·cos(t) / (1 + sin²(t))          */
+  if (isIdle) {
+    idleT += IDLE_SPEED;
+    const W   = window.innerWidth  * ORBIT_W;
+    const H   = window.innerHeight * ORBIT_H;
+    const s   = Math.sin(idleT);
+    const c   = Math.cos(idleT);
+    const d   = 1 + s * s;
+    px = idleCenterX + W * c / d;
+    py = idleCenterY + H * s * c / d;
+  }
+
+  /* [ИЗМЕНЕНИЕ 3] — угол по вектору реального движения */
+  const dx = px - prevPx;
+  const dy = py - prevPy;
+  if (Math.abs(dx) > 0.15 || Math.abs(dy) > 0.15) {
+    tgtAngle = Math.atan2(dy, dx) * (180 / Math.PI) - 35;
+  }
+  curAngle = lerp(curAngle, tgtAngle, 0.10);
+ 
+  prevPx = px; prevPy = py;
 
 /* ══════════════════════════
    REVEAL ON SCROLL

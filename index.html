@@ -56,7 +56,6 @@ body {
   color: var(--t1);
   line-height: 1.6;
   overflow-x: hidden;
-  cursor: none;
 }
 
 /* ── GRAIN ── */
@@ -68,37 +67,34 @@ body::before {
 }
 
 /* ══════════════════════════
-   PAPER PLANE CURSOR
-   — smooth spring physics
+   CURSOR — crosshair
 ══════════════════════════ */
-#plane-wrap {
-  position: fixed;
-  z-index: 9999;
-  pointer-events: none;
-  /* The wrapper lags behind mouse (smooth spring) */
-  /* Position updated via JS */
-  left: 0; top: 0;
-}
-#plane-inner {
-  /* The SVG rotates independently for direction */
-  width: 24px; height: 24px;
-  transform-origin: center center;
-  transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  filter: drop-shadow(0 0 5px rgba(155,191,214,0.55));
-}
-#plane-inner.hover {
-  filter: drop-shadow(0 0 9px rgba(155,191,214,0.9));
-  transform: scale(1.35) rotate(var(--plane-angle, -35deg)) !important;
-}
-/* Trail dot */
-#plane-trail {
-  position: fixed; z-index: 9997; pointer-events: none;
-  width: 4px; height: 4px; border-radius: 50%;
+body { cursor: none; }
+* { cursor: none; }
+
+#cur-dot {
+  position: fixed; z-index: 9999; pointer-events: none;
+  width: 5px; height: 5px; border-radius: 50%;
   background: var(--blue2);
-  opacity: 0.5;
-  left: 0; top: 0;
-  transition: opacity 0.3s;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 6px rgba(155,191,214,0.7);
 }
+#cur-ring {
+  position: fixed; z-index: 9998; pointer-events: none;
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 1px solid rgba(155,191,214,0.45);
+  transform: translate(-50%, -50%);
+  /* Тонкие засечки — как перекрестие прибора */
+  box-shadow:
+    0 -9px 0 0 rgba(155,191,214,0.3),
+    0  9px 0 0 rgba(155,191,214,0.3),
+   -9px 0  0 0 rgba(155,191,214,0.3),
+    9px 0  0 0 rgba(155,191,214,0.3);
+}
+/* На интерактивных элементах — кольцо расширяется */
+a:hover ~ #cur-ring,
+button:hover ~ #cur-ring { transform: translate(-50%,-50%) scale(1.6); }
+
 
 /* ── SCROLL PROGRESS ── */
 #prog {
@@ -577,8 +573,8 @@ footer {
    PRINT
 ══════════════════════════ */
 @media print {
-  nav, #plane-wrap, #plane-trail, #prog, body::before { display:none !important; }
-  body { background:#fff !important; color:#111 !important; cursor:default; }
+  nav, #cur-dot, #cur-ring, #prog, body::before { display:none !important; }
+  body, * { background-color: unset; color:#111 !important; cursor:default !important; }
   * { transition:none !important; animation:none !important; }
   #hero { grid-template-columns:1fr; padding:1rem; background:#fff; }
   .hero-r { border-left:none; padding-left:0; padding-top:0; }
@@ -623,16 +619,8 @@ footer {
 </head>
 <body>
 
-<!-- PLANE CURSOR -->
-<div id="plane-wrap">
-  <div id="plane-inner">
-    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
-      <path d="M22 2L11 13" stroke="#9bbfd6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="#9bbfd6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="rgba(127,168,196,0.12)"/>
-    </svg>
-  </div>
-</div>
-<div id="plane-trail"></div>
+<div id="cur-dot"></div>
+<div id="cur-ring"></div>
 <div id="prog"></div>
 
 <!-- NAVIGATION — no wordmark -->
@@ -913,7 +901,7 @@ footer {
     </div>
 
     <div class="tl rv">
-        <!-- ↓ НОВАЯ ПОЗИЦИЯ: строки 916–926 -->
+      <!-- ↓ НОВАЯ ПОЗИЦИЯ: строки 916–926 -->
       <div class="tl-item">
         <div class="tl-meta">
           <div class="tl-period">Дек 2024 — н.в.</div>
@@ -923,14 +911,13 @@ footer {
           <div class="tl-company">ПАО «Авиационный комплекс им. С.В. Ильюшина»</div>
           <div class="tl-role">Начальник отдела метрологического обеспечения испытаний и сертификации авиационной техники</div>
           <div class="tl-desc">Руководство отделом метрологического обеспечения испытаний и сертификации авиационной техники в ПАО «Ил».</div>
-                   </div>
+        </div>
       </div>
       <!-- ↑ конец новой позиции -->
       <!-- ↓ ПРЕДЫДУЩАЯ ПОЗИЦИЯ: период обновлён на строке 932 — «н.в.» → «Дек 2024» -->
       <div class="tl-item">
         <div class="tl-meta">
-          <div class="tl-period">Янв 2021 — н.в.</div>
-          <span class="tl-current-badge">текущая позиция</span>
+          <div class="tl-period">Янв 2021 — Дек 2024</div>
         </div>
         <div class="tl-body">
           <div class="tl-company">ПАО «Ил»</div>
@@ -992,100 +979,61 @@ footer {
 </footer>
 
 <script>
-/* ══════════════════════════════════════
-   SMOOTH PAPER PLANE CURSOR
-   Spring physics: plane lags behind mouse
-   Rotation: follows actual movement vector
-══════════════════════════════════════ */
-const planeWrap  = document.getElementById('plane-wrap');
-const planeInner = document.getElementById('plane-inner');
-const trail      = document.getElementById('plane-trail');
+/* ══════════════════════════
+   CURSOR — crosshair dot + ring
+   Dot: мгновенно к мыши
+   Ring: мягкий лаг (lerp)
+   Hover: кольцо расширяется
+══════════════════════════ */
+const dot  = document.getElementById('cur-dot');
+const ring = document.getElementById('cur-ring');
 
-// Current and target positions
-let tx = window.innerWidth / 2, ty = window.innerHeight / 2; // target (mouse)
-let cx = tx, cy = ty;    // current (lagged)
-let vx = 0, vy = 0;      // velocity
-
-// Trail lags further behind
-let trx = tx, try_ = ty;
-
-// Spring constants
-const SPRING    = 0.10;  // stiffness (lower = more lag)
-const DAMPING   = 0.72;  // friction  (lower = more bounce)
-const TRAIL_LAG = 0.06;
-
-let currentAngle = -35; // initial angle
-let targetAngle  = -35;
-let isHovering   = false;
+let mx = -100, my = -100; // позиция мыши
+let rx = -100, ry = -100; // позиция кольца (лаг)
+let isHover = false;
 
 document.addEventListener('mousemove', e => {
- px = e.clientX;
-py = e.clientY;
+  mx = e.clientX;
+  my = e.clientY;
+  dot.style.left = mx + 'px';
+  dot.style.top  = my + 'px';
 });
 
-function lerp(a, b, t) { return a + (b - a) * t; }
-
-/* ── Автопилот ── */
-const IDLE_DELAY = 2000;   // мс без движения → включить автопилот
-const IDLE_SPEED = 0.004;  // угловая скорость (меньше = медленнее)
-const ORBIT_W    = 0.28;   // ширина «8»  как доля ширины экрана
-const ORBIT_H    = 0.18;   // высота «8»  как доля высоты экрана
- 
-let idleTimer   = null;
-let isIdle      = false;
-let idleT       = 0;          // параметр кривой [0..2π)
-let idleCenterX = px;
-let idleCenterY = py;
-
-  /* ── Трейл ── */
-let trx = px, try_ = py;
- 
-/* ══ mousemove: самолётик МГНОВЕННО к мыши ══
-   (строка ниже — нет lerp/spring, прямое присвоение) */
-document.addEventListener('mousemove', e => {
-  /* [ИЗМЕНЕНИЕ 1] — прямое присвоение, без пружины */
-  px = e.clientX;
-  py = e.clientY;
- 
-  /* Сброс автопилота при движении */
-  if (isIdle) {
-    isIdle = false;
-    idleT  = 0;
-  }
-  clearTimeout(idleTimer);
-  /* [ИЗМЕНЕНИЕ 2] — запуск автопилота через IDLE_DELAY */
-  idleTimer = setTimeout(() => {
-    isIdle      = true;
-    idleCenterX = px;
-    idleCenterY = py;
-  }, IDLE_DELAY);
+// Расширение кольца на интерактивных элементах
+document.querySelectorAll('a, button, .met, .exp-card, .case-row, .tl-item, .method-item').forEach(el => {
+  el.addEventListener('mouseenter', () => { isHover = true;  });
+  el.addEventListener('mouseleave', () => { isHover = false; });
 });
 
-/* ══ Главный цикл ══ */
-function tick() {
-  /* [ИЗМЕНЕНИЕ 2] — автопилот: lemniscate Бернулли
-     x = a·cos(t) / (1 + sin²(t))
-     y = a·sin(t)·cos(t) / (1 + sin²(t))          */
-  if (isIdle) {
-    idleT += IDLE_SPEED;
-    const W   = window.innerWidth  * ORBIT_W;
-    const H   = window.innerHeight * ORBIT_H;
-    const s   = Math.sin(idleT);
-    const c   = Math.cos(idleT);
-    const d   = 1 + s * s;
-    px = idleCenterX + W * c / d;
-    py = idleCenterY + H * s * c / d;
+(function loop() {
+  // Мягкий лаг кольца
+  rx += (mx - rx) * 0.12;
+  ry += (my - ry) * 0.12;
+
+  ring.style.left  = rx + 'px';
+  ring.style.top   = ry + 'px';
+
+  if (isHover) {
+    ring.style.width  = '44px';
+    ring.style.height = '44px';
+    ring.style.borderColor = 'rgba(155,191,214,0.7)';
+  } else {
+    ring.style.width  = '28px';
+    ring.style.height = '28px';
+    ring.style.borderColor = 'rgba(155,191,214,0.45)';
   }
 
-  /* [ИЗМЕНЕНИЕ 3] — угол по вектору реального движения */
-  const dx = px - prevPx;
-  const dy = py - prevPy;
-  if (Math.abs(dx) > 0.15 || Math.abs(dy) > 0.15) {
-    tgtAngle = Math.atan2(dy, dx) * (180 / Math.PI) - 35;
-  }
-  curAngle = lerp(curAngle, tgtAngle, 0.10);
- 
-  prevPx = px; prevPy = py;
+  requestAnimationFrame(loop);
+})();
+
+/* ══════════════════════════
+   SCROLL PROGRESS
+══════════════════════════ */
+const prog = document.getElementById('prog');
+window.addEventListener('scroll', () => {
+  const ratio = window.scrollY / (document.body.scrollHeight - innerHeight);
+  prog.style.transform = `scaleX(${ratio})`;
+}, { passive: true });
 
 /* ══════════════════════════
    REVEAL ON SCROLL
